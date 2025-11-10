@@ -3,7 +3,7 @@ package com.example.bankcard_api.DTO;
 import lombok.Data;
 
 @Data
-public class ReqisterRequest {
+public class RegisterRequest {
     
 
     private String username;

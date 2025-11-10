@@ -10,6 +10,9 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.example.bankcard_api.exception.InvalidJwtException;
+
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -42,12 +45,16 @@ public class JwtUtill {
     }
 
     public String exctractUsername(String token){
-        return Jwts.parserBuilder()
-            .setSigningKey(key)
-            .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try{
+            return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch(JwtException e){
+            throw new InvalidJwtException("Invalid jwt Exception", e);
+        }
     }
 
     public String exctractRole(String token){
