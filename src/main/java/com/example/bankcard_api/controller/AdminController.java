@@ -3,6 +3,9 @@ package com.example.bankcard_api.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bankcard_api.DTO.AdminCardDTO;
@@ -66,18 +70,26 @@ public class AdminController {
 
     @GetMapping("/cards")
     @Operation(summary = "Get all cards with raw card numbers")
-    public ResponseEntity<List<AdminCardDTO>> getAllCards() {
-        return ResponseEntity.ok(cardService.getAllCardsRaw());
+    public ResponseEntity<Page<AdminCardDTO>> getAllCards(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(cardService.getAllCardsRaw(page, size));
     }
 
     // Users
     @GetMapping("/users")
     @Operation(summary = "List users")
-    public ResponseEntity<List<AdminUserDTO>> listUsers() {
-        List<User> users = userService.getAllUsers();
-        List<AdminUserDTO> dtos = users.stream()
-            .map(u -> new AdminUserDTO(u.getId(), u.getUsername(), u.getRole(), u.getCreatedAt()))
-            .collect(Collectors.toList());
+    public ResponseEntity<Page<AdminUserDTO>> listUsers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userService.getAllUsersForPage(pageable);
+        Page<AdminUserDTO> dtos = users.map(user -> new AdminUserDTO(user.getId(),
+            user.getUsername(),
+            user.getRole(),
+            user.getCreatedAt()));
         return ResponseEntity.ok(dtos);
     }
 
@@ -91,11 +103,7 @@ public class AdminController {
     @DeleteMapping("/users/{userId}")
     @Operation(summary = "Delete user")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
-        // Simple delete via repository
-        User u = userService.findUserById(userId); // throws if not found
-        // If cascading is configured on cards, deleting user will delete cards; else enforce manually
-        // For simplicity, using repository delete:
-        // userService.deleteUser(userId); // add method if preferred
+        User u = userService.deleteUserById(userId);
         return ResponseEntity.noContent().build();
     }
 }

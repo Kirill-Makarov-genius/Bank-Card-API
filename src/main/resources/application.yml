@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost/bank-db
+    url: jdbc:postgresql://db/bank-db
     username: postgres
     password: 123
   jpa:

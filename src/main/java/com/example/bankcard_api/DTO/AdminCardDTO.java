@@ -14,7 +14,7 @@ public class AdminCardDTO {
     private Long id;
     private Long userId;
     private String username;
-    private String cardNumber; // raw
+    private String cardNumber;
     private BigDecimal balance;
     private LocalDateTime createdAt;
     private String expiry;

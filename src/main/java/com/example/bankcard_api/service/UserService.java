@@ -2,11 +2,12 @@ package com.example.bankcard_api.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.example.bankcard_api.entity.User;
-import com.example.bankcard_api.enums.Role;
 import com.example.bankcard_api.exception.UserNotFoundException;
 import com.example.bankcard_api.repository.UserRepository;
 
@@ -25,6 +26,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public Page<User> getAllUsersForPage(Pageable pageable){
+        return userRepository.findAll(pageable);
+    }
+
     public User saveUser(User newUser){
 
         return userRepository.save(newUser);
@@ -34,6 +39,10 @@ public class UserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException(id));
         return user;    
+    }
+
+    public User deleteUserById(Long id){
+        return userRepository.deleteUserById(id);
     }
 
     public User getCurrentUser(Authentication auth){

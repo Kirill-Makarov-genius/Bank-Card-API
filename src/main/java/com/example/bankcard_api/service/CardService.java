@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +39,19 @@ public class CardService {
     private static final DateTimeFormatter EXPIRY_FORMATTER = DateTimeFormatter.ofPattern("MM/yyyy");
     private static final int EXPIRY_YEARS = 4; // default card validity period
 
-    public List<CardDTO> getUserCards(User user){
+    public Page<CardDTO> getUserCards(User user, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
         
-        return cardRepository.findByUser(user)
-            .stream()
-            .map(this::toDTO)
-            .collect(Collectors.toList());
+        Page<Card> cards;
+        if (user.getCards() != null){
+            cards = cardRepository.findAllByUser(user, pageable);
+        } 
+        else {
+            cards = cardRepository.findAll(pageable);
+        }
+        
+        return cards.map(this::toCardDTO);
+        
     }
 
     public CardDTO createCard(User user, String cardNumber){
@@ -58,7 +68,7 @@ public class CardService {
             .expiry(expiry)
             .build();
         
-        return toDTO(cardRepository.save(card));
+        return toCardDTO(cardRepository.save(card));
     }
 
     public CardDTO updateBalance(Long cardId, BigDecimal newBalance, User user, boolean isAdmin){
@@ -71,7 +81,7 @@ public class CardService {
 
         card.setBalance(newBalance);
         
-        return toDTO(cardRepository.save(card));
+        return toCardDTO(cardRepository.save(card));
     }
 
     public void deleteCard(Long cardId, User user, boolean isAdmin){
@@ -114,21 +124,10 @@ public class CardService {
         cardRepository.save(from);
         cardRepository.save(to);
 
-        return new TransferResponse(toDTO(from), toDTO(to));
+        return new TransferResponse(toCardDTO(from), toCardDTO(to));
     }
 
-    public AdminCardDTO toAdminDTO(Card card){
-        return new AdminCardDTO(
-            card.getId(),
-            card.getUser().getId(),
-            card.getUser().getUsername(),
-            card.getCardNumber(),
-            card.getBalance(),
-            card.getCreatedAt(),
-            card.getExpiry(),
-            card.getStatus()
-        );
-    }
+
 
     // Admin operations
     public AdminCardDTO createCardForUser(Long userId, String cardNumber, String explicitExpiry) {
@@ -165,11 +164,17 @@ public class CardService {
         cardRepository.deleteById(cardId);
     }
 
-    public List<AdminCardDTO> getAllCardsRaw(){
-        return cardRepository.findAll().stream().map(this::toAdminDTO).collect(Collectors.toList());
+    public Page<AdminCardDTO> getAllCardsRaw(int page, int size){
+
+        Pageable pageable = PageRequest.of(page, size);
+        
+        Page<Card> cards = cardRepository.findAll(pageable);
+
+
+        return cards.map(this::toAdminDTO);
     }
 
-    private CardDTO toDTO(Card card){
+    private CardDTO toCardDTO(Card card){
         return new CardDTO(
             card.getId(),
             card.getCardNumber(),
@@ -179,6 +184,18 @@ public class CardService {
             card.getStatus()
         );
     }
+    private AdminCardDTO toAdminDTO(Card card){
+    return new AdminCardDTO(
+        card.getId(),
+        card.getUser().getId(),
+        card.getUser().getUsername(),
+        card.getCardNumber(),
+        card.getBalance(),
+        card.getCreatedAt(),
+        card.getExpiry(),
+        card.getStatus()
+    );
+}
 
 
 }
