@@ -1,13 +1,15 @@
-package com.example.bankcard_api.utils;
+package com.example.bankcard_api.service;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
+
 import java.util.Date;
-import java.util.List;
+
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.bankcard_api.exception.InvalidJwtException;
@@ -16,10 +18,9 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 
 @Component
-public class JwtUtill {
+public class JwtService {
     
     
 
@@ -27,7 +28,7 @@ public class JwtUtill {
     private final SecretKey key;
 
     
-    public JwtUtill(@Value("${token.signing.key}") String jwtSecret,
+    public JwtService(@Value("${token.signing.key}") String jwtSecret,
         @Value("${token.signing.expirationsMs}") Long expirationsMs){
         
         this.expirationsMs = expirationsMs;    
@@ -75,4 +76,11 @@ public class JwtUtill {
             return false;
         }
     }
+
+    public String getCurrentUsername(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (auth != null) ? auth.getName() : null;
+    }
+
+
 }

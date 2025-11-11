@@ -8,8 +8,10 @@ import com.example.bankcard_api.DTO.RegisterRequest;
 import com.example.bankcard_api.entity.User;
 import com.example.bankcard_api.enums.Role;
 import com.example.bankcard_api.repository.UserRepository;
-import com.example.bankcard_api.utils.JwtUtill;
+import com.example.bankcard_api.service.JwtService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +27,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtill jwtUtill;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -44,13 +46,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
+
+        
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-        String token = jwtUtill.generateToken(user.getUsername(), user.getRole().name());
+        String token = jwtService.generateToken(user.getUsername(), user.getRole().name());
+
+
         return ResponseEntity.ok(new AuthResponse(token));
     }
 }

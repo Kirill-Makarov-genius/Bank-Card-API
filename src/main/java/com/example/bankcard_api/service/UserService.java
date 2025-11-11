@@ -2,10 +2,12 @@ package com.example.bankcard_api.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.example.bankcard_api.entity.User;
 import com.example.bankcard_api.enums.Role;
+import com.example.bankcard_api.exception.UserNotFoundException;
 import com.example.bankcard_api.repository.UserRepository;
 
 @Service
@@ -26,6 +28,18 @@ public class UserService {
     public User saveUser(User newUser){
 
         return userRepository.save(newUser);
+    }
+
+    public User findUserById(Long id){
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+        return user;    
+    }
+
+    public User getCurrentUser(Authentication auth){
+        String username = auth.getName();
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
     }
 
 }
