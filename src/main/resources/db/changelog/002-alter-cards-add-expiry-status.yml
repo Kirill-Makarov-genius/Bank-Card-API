@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-add-expiry-and-status-to-cards
+      author: kirill
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: cards
+      changes:
+        - addColumn:
+            tableName: cards
+            columns:
+              - column:
+                  name: expiry
+                  type: VARCHAR(7)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true
+        - update:
+            tableName: cards
+            columns:
+              - column:
+                  name: status
+                  value: "ACTIVE"
+            where: status IS NULL
+        - sql:
+            comment: Set expiry for existing rows to current month + 4 years in MM/YYYY
+            sql: >
+              UPDATE cards
+              SET expiry = TO_CHAR((DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '4 years'), 'MM/YYYY')
+              WHERE expiry IS NULL;
+        - addNotNullConstraint:
+            tableName: cards
+            columnName: expiry
+            columnDataType: VARCHAR(7)
+        - addNotNullConstraint:
+            tableName: cards
+            columnName: status
+            columnDataType: VARCHAR(20)

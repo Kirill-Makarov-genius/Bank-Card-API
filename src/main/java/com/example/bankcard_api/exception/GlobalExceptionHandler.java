@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
-    public ResponseEntity<Map<String, Object>> handleJwtException(ForbiddenOperationException ex) {
+    public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenOperationException ex) {
         Map<String, Object> error = new HashMap<>();
         error.put("timestamp", LocalDateTime.now());
         error.put("error", ex.getMessage());
@@ -48,6 +48,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CardAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleCardAlreadyExists(CardAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "error", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<Map<String, Object>> handleInsufficient(InsufficientFundsException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "error", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(SameCardTransferException.class)
+    public ResponseEntity<Map<String, Object>> handleSameCard(SameCardTransferException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "error", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(TransferOwnershipException.class)
+    public ResponseEntity<Map<String, Object>> handleOwnership(TransferOwnershipException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "error", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArg(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "timestamp", LocalDateTime.now(),
                 "error", ex.getMessage()
         ));

@@ -3,11 +3,14 @@ package com.example.bankcard_api.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bankcard_api.DTO.CardDTO;
+import com.example.bankcard_api.DTO.CardCreateRequest;
 import com.example.bankcard_api.entity.Card;
 import com.example.bankcard_api.entity.User;
 import com.example.bankcard_api.enums.Role;
+import com.example.bankcard_api.enums.CardStatus;
 import com.example.bankcard_api.service.CardService;
 import com.example.bankcard_api.service.UserService;
+import com.example.bankcard_api.DTO.UpdateBalanceRequest;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -47,25 +50,23 @@ public class CardController {
 
 
     @PostMapping("/my")
-    public ResponseEntity<CardDTO> createCard(@RequestBody CardDTO cardDTO, Authentication auth) {
-        
+    public ResponseEntity<CardDTO> createCard(@RequestBody CardCreateRequest request, Authentication auth) {
         User currentUser = userService.getCurrentUser(auth);
-        String cardNumber = cardDTO.getCardNumber();
+        String cardNumber = request.getCardNumber();
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(cardService.createCard(currentUser, cardNumber));
-
     }
     
     @PutMapping("/{cardId}/balance")
     public ResponseEntity<CardDTO> updateBalance(
         @PathVariable Long cardId,
-        @RequestBody CardDTO cardDTO,
+        @RequestBody UpdateBalanceRequest request,
         Authentication auth
     ) {
         
         User currentUser = userService.getCurrentUser(auth);
         boolean isAdmin = currentUser.getRole().equals(Role.ADMIN);
-        BigDecimal newBalance = cardDTO.getBalance();
+        BigDecimal newBalance = request.getBalance();
         return ResponseEntity.ok(cardService.updateBalance(cardId, newBalance, currentUser, isAdmin));
      
     }

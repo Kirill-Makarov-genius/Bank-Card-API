@@ -40,6 +40,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register", "/api/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // Only authenticated users can access card endpoints
                 .requestMatchers("/api/cards/**").authenticated()
+                .requestMatchers("/api/transfers/**").authenticated()
+                .requestMatchers("/api/admin/**").authenticated()
                 .anyRequest().denyAll()
             )
 

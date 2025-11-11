@@ -3,6 +3,7 @@ package com.example.bankcard_api.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 
 
 import jakarta.persistence.Column;
@@ -14,11 +15,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import com.example.bankcard_api.enums.CardStatus;
 
 @Entity
 @Table(name="cards")
@@ -45,6 +50,13 @@ public class Card implements Serializable{
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    
+    @Column(name = "expiry", nullable = false, length = 7)
+    private String expiry; 
 
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private CardStatus status = CardStatus.ACTIVE;
 
 }
