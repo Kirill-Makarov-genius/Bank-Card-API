@@ -10,7 +10,6 @@ import com.example.bankcard_api.enums.Role;
 import com.example.bankcard_api.repository.UserRepository;
 import com.example.bankcard_api.service.JwtService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

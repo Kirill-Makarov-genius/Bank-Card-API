@@ -1,8 +1,6 @@
 package com.example.bankcard_api.service;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
@@ -174,7 +172,7 @@ public class CardService {
         return cards.map(this::toAdminDTO);
     }
 
-    private CardDTO toCardDTO(Card card){
+    public CardDTO toCardDTO(Card card){
         return new CardDTO(
             card.getId(),
             card.getCardNumber(),
@@ -184,7 +182,7 @@ public class CardService {
             card.getStatus()
         );
     }
-    private AdminCardDTO toAdminDTO(Card card){
+    public AdminCardDTO toAdminDTO(Card card){
     return new AdminCardDTO(
         card.getId(),
         card.getUser().getId(),
@@ -194,8 +192,7 @@ public class CardService {
         card.getCreatedAt(),
         card.getExpiry(),
         card.getStatus()
-    );
-}
-
+        );
+    }
 
 }

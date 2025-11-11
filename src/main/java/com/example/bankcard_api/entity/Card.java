@@ -3,7 +3,6 @@ package com.example.bankcard_api.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 
 
 import jakarta.persistence.Column;

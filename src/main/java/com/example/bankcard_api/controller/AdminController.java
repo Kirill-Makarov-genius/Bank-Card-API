@@ -1,8 +1,5 @@
 package com.example.bankcard_api.controller;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -103,7 +100,7 @@ public class AdminController {
     @DeleteMapping("/users/{userId}")
     @Operation(summary = "Delete user")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
-        User u = userService.deleteUserById(userId);
+        userService.deleteUserById(userId);
         return ResponseEntity.noContent().build();
     }
 }

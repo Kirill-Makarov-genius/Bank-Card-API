@@ -34,6 +34,9 @@ public class JwtService {
         this.expirationsMs = expirationsMs;    
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
+    public SecretKey getKey(){
+        return key;
+    }
 
     public String generateToken(String username, String role){
         return Jwts.builder()
@@ -58,7 +61,7 @@ public class JwtService {
         }
     }
 
-    public String exctractRole(String token){
+    public String extractRole(String token){
         Object r = Jwts.parserBuilder()
             .setSigningKey(key)
             .build()
